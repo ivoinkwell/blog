@@ -75,6 +75,7 @@
   { name: "猪老师在线", desc: "最有能力的老师，网络安全没人比他讲的更好！", url: "https://www.pigteacher.com", logo: "https://www.pigteacher.com/wp-content/uploads/2025/01/cropped-1-180x180.jpg" },
   { name: "云泽の小屋-网站推荐", desc: "优秀网站的收藏夹", url: "https://zeyun.org/good-web/", logo: "https://zeyun.org/favicon/Happy_Mac.PNG" },
   // { name: "陆某的恋爱小笔记", desc: "不定时吃瓜~", url: "https://luhaorantxm0906.dpdns.org", logo: "https://luhaorantxm0906.dpdns.org/media/website/favicon.ico" },
+  { name: "xuan301", desc: "新手必看的Python学习笔记", url: "https://xuan301.ccwu.cc", logo: "https://xuan301.ccwu.cc/images/favicon.ico" },
   ];
 
   const container = document.getElementById("friends-links");
