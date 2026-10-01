@@ -49,10 +49,6 @@ export const navBarConfig: NavBarConfig = {
 		LinkPreset.Archive,
 		LinkPreset.About,
 		{
-			name: "留言板", // 友链页面，内容在 src/content/spec/friends.md
-			url: "/msg/",
-		},
-		{
 			name: "友链", // 友链页面，内容在 src/content/spec/friends.md
 			url: "/friends/",
 		},
