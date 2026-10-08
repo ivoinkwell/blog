@@ -102,8 +102,8 @@ export async function getCategoryList(): Promise<Category[]> {
 	const lst = Object.keys(count).sort((a, b) => {
 		// 按 config 的 categoryOrder 排序，未列出的分类按拼音排后面
 		const order = new Map(siteConfig.categoryOrder.map((c, i) => [c, i]));
-		const ia = order.has(a) ? order.get(a) : Number.MAX_SAFE_INTEGER;
-		const ib = order.has(b) ? order.get(b) : Number.MAX_SAFE_INTEGER;
+		const ia = order.get(a) ?? Number.MAX_SAFE_INTEGER;
+		const ib = order.get(b) ?? Number.MAX_SAFE_INTEGER;
 		if (ia !== ib) return ia - ib;
 		return a.toLowerCase().localeCompare(b.toLowerCase());
 	});
