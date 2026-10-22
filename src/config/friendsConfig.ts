@@ -81,7 +81,7 @@ export const friendsConfig: FriendLink[] = [
 		title: "猪老师在线",
 		imgurl:"https://www.pigteacher.com/wp-content/uploads/2025/01/cropped-1-180x180.jpg",
 		desc: "我的老师，网络安全专家",
-		siteurl: "https://zeyun.org",
+		siteurl: "https://www.pigteacher.com",
 		tags: ["Blog"],
 		weight: 9, // 权重，数字越大排序越靠前
 		enabled: true, // 是否启用
