@@ -80,7 +80,7 @@ export const friendsConfig: FriendLink[] = [
 	{
 		title: "xiezaizai",
 		imgurl:"https://xiezaiz.ccwu.cc/a1.jpg",
-		desc: "朋友，最详细网络安全实践笔记",
+		desc: "淡淡的就会顺顺",
 		siteurl: "https://xiezaiz.ccwu.cc",
 		tags: ["Blog"],
 		weight: 9, // 权重，数字越大排序越靠前
