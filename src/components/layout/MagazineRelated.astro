@@ -1,0 +1,49 @@
+---
+import type { PostForList } from "@/utils/content-utils";
+import { formatDateToYYYYMMDD } from "@/utils/date-utils";
+import { getFileDirFromPath, getPostUrlBySlug } from "@/utils/url-utils";
+import ImageWrapper from "@/components/common/ImageWrapper.astro";
+
+interface Props {
+	posts: PostForList[];
+}
+
+const { posts } = Astro.props;
+const list = posts.slice(0, 3);
+---
+
+<section class="related">
+	<h3 class="related-title">
+		<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7.4-6.3-4.6L5.7 21.4 8 14 2 9.4h7.6z" /></svg>
+		相关推荐
+	</h3>
+	<div class="related-grid">
+		{list.map((post) => {
+			const image = post.data.image;
+			const hasCover = !!image;
+			return (
+				<a class="related-card" href={getPostUrlBySlug(post.id)}>
+					{hasCover ? (
+						<ImageWrapper
+							src={image}
+							basePath={getFileDirFromPath(post.filePath || "")}
+							alt={post.data.title}
+							class="w-full h-full"
+							loading="lazy"
+							widths={[828]}
+							sizes="(max-width: 1024px) 100vw, 480px"
+						/>
+					) : (
+						<span class="typo-cover">
+							<span class="typo-label">{post.data.title.slice(0, 2)}</span>
+						</span>
+					)}
+					<div class="related-body">
+						<span class="rc-title">{post.data.title}</span>
+						<span class="rc-date">{formatDateToYYYYMMDD(post.data.published)}</span>
+					</div>
+				</a>
+			);
+		})}
+	</div>
+</section>

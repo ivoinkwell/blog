@@ -1,0 +1,89 @@
+---
+import { Icon } from "astro-icon/components";
+import SharePoster from "@/components/misc/SharePoster.svelte";
+import { licenseConfig } from "@/config/licenseConfig";
+import { profileConfig } from "@/config/profileConfig";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+
+interface Props {
+	title: string;
+	author?: string;
+	description?: string;
+	pubDate: string;
+	url: string;
+	siteTitle: string;
+	coverImage?: string | null;
+	coverImageSelector?: string | null;
+	avatar?: string | null;
+	avatarSelector?: string | null;
+}
+
+const {
+	title,
+	author,
+	description,
+	pubDate,
+	url,
+	siteTitle,
+	coverImage,
+	coverImageSelector,
+	avatar,
+	avatarSelector,
+} = Astro.props;
+
+const licenseName = licenseConfig.name;
+const licenseUrl = licenseConfig.url;
+---
+
+<div class="action-card">
+	<div class="license-info">
+		<div class="license-icon">
+			<Icon name="fa7-regular:copyright" class="text-[1.6rem]" />
+		</div>
+		<div class="license-text">
+			<b>{licenseName}</b>
+			<span>
+				{i18n(I18nKey.license)}：{" "}
+				<a href={licenseUrl} target="_blank" rel="noreferrer">
+					{licenseName}
+				</a>
+			</span>
+		</div>
+	</div>
+	<div class="share-actions">
+		<button class="share-btn" id="magazine-copy-link" type="button">
+			<Icon name="material-symbols:link" class="text-[1.05rem]" />
+			{i18n(I18nKey.copyLink)}
+		</button>
+		<SharePoster
+			client:load
+			{title}
+			author={author || profileConfig.name}
+			description={description || title}
+			{pubDate}
+			{coverImage}
+			{coverImageSelector}
+			{url}
+			{siteTitle}
+			{avatar}
+			{avatarSelector}
+		/>
+	</div>
+</div>
+
+<script>
+	const btn = document.getElementById("magazine-copy-link");
+	if (btn) {
+		btn.addEventListener("click", async () => {
+			try {
+				await navigator.clipboard.writeText(window.location.href);
+				const original = btn.innerHTML;
+				btn.innerHTML = "已复制";
+				setTimeout(() => (btn.innerHTML = original), 1500);
+			} catch {
+				/* ignore */
+			}
+		});
+	}
+</script>

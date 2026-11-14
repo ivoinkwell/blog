@@ -1,0 +1,21 @@
+---
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import { getCategoryList } from "@/utils/content-utils";
+
+const categories = await getCategoryList();
+---
+
+<section class="widget">
+	<div class="widget-title">{i18n(I18nKey.categories)}</div>
+	<ul class="cat-list">
+		{categories.map((c) => (
+			<li>
+				<a href={c.url}>
+					<span>{c.name}</span>
+					<span class="cat-count">{c.count}</span>
+				</a>
+			</li>
+		))}
+	</ul>
+</section>

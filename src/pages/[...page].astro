@@ -1,7 +1,6 @@
 ---
 import type { GetStaticPaths } from "astro";
-import Pagination from "@/components/common/Pagination.astro";
-import PostPage from "@/components/layout/PostPage.astro";
+import MagazineHome from "@/components/layout/MagazineHome.astro";
 import { siteConfig } from "@/config";
 import I18nKey from "@/i18n/i18nKey";
 import { i18n } from "@/i18n/translation";
@@ -18,8 +17,6 @@ export const getStaticPaths = (async ({ paginate }) => {
 
 const { page } = Astro.props;
 
-const len = page.data.length;
-
 // 列表页隐藏的 h1：首屏用站点标题，后续页用「首页 · 页码」，避免空 h1
 const heading =
 	page.currentPage === 1
@@ -27,17 +24,8 @@ const heading =
 		: `${i18n(I18nKey.home)} · ${page.currentPage}`;
 ---
 
-<MainGridLayout heading={heading}>
-  <PostPage page={page} />
-  {
-    page.total > page.size && (
-      <Pagination
-        class="mx-auto onload-animation"
-        page={page}
-        style={`animation-delay: calc(var(--content-delay) + ${len * 50}ms)`}
-      />
-    )
-  }
+<MainGridLayout heading={heading} magazine>
+  <MagazineHome page={page} />
 </MainGridLayout>
 
 <script>

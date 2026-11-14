@@ -3,7 +3,8 @@ import Live2DWidget from "@components/features/Live2DWidget.astro";
 
 import SpineModel from "@components/features/SpineModel.astro";
 import Footer from "@components/layout/Footer.astro";
-import HeaderTopRow from "@components/layout/HeaderTopRow.astro";
+import MagazineFooter from "@components/layout/MagazineFooter.astro";
+import MagazineNavbar from "@components/layout/MagazineNavbar.astro";
 import NavMenuPanel from "@components/layout/NavMenuPanel.astro";
 import SideBar from "@components/layout/SideBar.astro";
 import type { MarkdownHeading } from "astro";
@@ -13,7 +14,6 @@ import SidebarColumn from "@/components/layout/SidebarColumn.astro";
 import WallpaperSection from "@/components/layout/WallpaperSection.astro";
 import {
 	live2dWidgetConfig,
-	navbarMode,
 	sidebarLayoutConfig,
 	siteConfig,
 } from "@/config";
@@ -47,6 +47,8 @@ interface Props {
 		minutes?: number;
 	};
 	heading?: string;
+	/** 杂志卡片风布局：单栏、胶囊导航、无壁纸/侧栏 */
+	magazine?: boolean;
 }
 
 const backgroundImages = getBackgroundImages();
@@ -66,12 +68,12 @@ const {
 	encrypted = false,
 	bannerPostMeta,
 	heading,
+	magazine = false,
 } = Astro.props;
 
 const isHomePageCheck = isHomePage(Astro.url.pathname);
 const isPostPage = !!postSlug;
 const shouldRenderCategoryBar = !!siteConfig.categoryBar;
-const navbarWidthFull = siteConfig.navbar.widthFull ?? false;
 
 const banner = getBannerVisibilityState({
 	isHomePage: isHomePageCheck,
@@ -96,9 +98,9 @@ const {
 <Layout title={title} description={description} lang={lang} setOGTypeArticle={setOGTypeArticle} postSlug={postSlug} postCoverImage={postCoverImage} ogImageWidth={ogImageWidth} ogImageHeight={ogImageHeight} ogImageAlt={ogImageAlt} hasWallpaper={hasWallpaper}>
 
 <slot slot="head" name="head" />
-<HeaderTopRow navbarMode={navbarMode} navbarWidthFull={navbarWidthFull} />
+<MagazineNavbar />
 
-<WallpaperSection state={banner} backgroundImages={backgroundImages} title={title} bannerPostMeta={bannerPostMeta} />
+{!magazine && <WallpaperSection state={banner} backgroundImages={backgroundImages} title={title} bannerPostMeta={bannerPostMeta} />}
 
 <!-- Main content -->
 <div id="content-panel" class="content-panel absolute w-full z-30 pointer-events-none">
@@ -112,6 +114,7 @@ const {
           {...gridDataAttrs}
         >
 
+            {!magazine && (
             <SidebarColumn
                 side="left"
                 position={sidebarLayoutConfig.position}
@@ -123,11 +126,12 @@ const {
                 headings={headings}
                 encrypted={encrypted}
             />
+            )}
                     
             {/* 主内容区包装器 - 包含静态栏位和swup容器，作为单个grid item */}
             <div id="content-column" class={staticBarClass}>
                 {/* 分类导航栏 - 全站渲染并显示 */}
-                {shouldRenderCategoryBar && <div id="category-bar-wrapper"><CategoryBar currentPostCategory={postCategory} /></div>}
+                {!magazine && shouldRenderCategoryBar && <div id="category-bar-wrapper"><CategoryBar currentPostCategory={postCategory} /></div>}
                 {/* 主内容区 - 始终渲染，确保 Swup 容器存在 */}
                 <main
                     id="swup-container"
@@ -136,19 +140,20 @@ const {
                 >
                 {/* 为每个页面提供一个隐藏的h1标题，用于SEO和可访问性 */}
                 <h1 class="sr-only">{heading || title}</h1>
-                <div id="content-wrapper" class="onload-animation transition-leaving">
+                <div id="content-wrapper" class:list={["onload-animation", "transition-leaving", magazine ? "page-frame" : "", magazine && postSlug ? "post-page" : ""]}>
                     <slot></slot>
                 </div>
             </main>
 
                 {/* 移动端底部组件：<768px 时 #main-grid 是 display:block，必须排在页脚之前 */}
-                {sidebarLayoutConfig.mobileBottomComponents && sidebarLayoutConfig.mobileBottomComponents.length > 0 && (
+                {!magazine && sidebarLayoutConfig.mobileBottomComponents && sidebarLayoutConfig.mobileBottomComponents.length > 0 && (
                     <div id="mobile-bottom-sidebar" class="block md:hidden mt-4">
                         <SideBar side="bottom" headings={headings} encrypted={encrypted}></SideBar>
                     </div>
                 )}
             </div>
 
+            {!magazine && (
             <SidebarColumn
                 side="right"
                 position={sidebarLayoutConfig.position}
@@ -160,15 +165,16 @@ const {
                 headings={headings}
                 encrypted={encrypted}
             />
+            )}
 
         </div>
 
-        <SpineModel></SpineModel>
+        {!magazine && <SpineModel></SpineModel>}
         {live2dWidgetConfig.enable && <Live2DWidget config={live2dWidgetConfig} />}
 
         {/* 页脚宽度跨「侧栏 + 内容栏」，故在 #content-column 之外；又在 Swup 容器之外，
             切页不重渲染 */}
-        <Footer />
+        {magazine ? <MagazineFooter /> : <Footer />}
     </div>
 </div>
 

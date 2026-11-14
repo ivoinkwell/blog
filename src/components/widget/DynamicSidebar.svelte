@@ -107,14 +107,14 @@ function formatDate(timestamp: number): string {
 			{@const hasImage = (entry.images?.length ?? 0) > 0}
 			<a
 				href={url(`/dynamic/#dynamic-${entry.id}`)}
-				class="group flex min-w-0 min-h-16 items-center gap-3 rounded-lg p-2
+				class="group dyn-item flex min-w-0 min-h-16 items-center gap-3 rounded-lg p-2
 					text-neutral-700/75 dark:text-neutral-300/75
 					hover:bg-(--btn-plain-bg-hover) hover:text-(--primary)
 					active:bg-(--btn-plain-bg-active) transition-colors duration-150"
 				aria-label={`${i18n(I18nKey.dynamic)}: ${text}`}
 			>
 				<div class="min-w-0 flex-1">
-					<div class="mb-1 flex items-center gap-1 text-xs leading-4 text-(--primary)">
+					<div class="dyn-date mb-1 flex items-center gap-1 text-xs leading-4 text-(--primary)">
 						<svg class="size-4 shrink-0" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
 							<path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
 						</svg>

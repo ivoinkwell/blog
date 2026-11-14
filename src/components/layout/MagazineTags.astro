@@ -1,0 +1,27 @@
+---
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import { getTagList } from "@/utils/content-utils";
+import { getTagUrl, url } from "@/utils/url-utils";
+
+const tags = await getTagList();
+const visible = tags.slice(0, 12);
+const hiddenCount = tags.length - visible.length;
+---
+
+<section class="widget">
+	<div class="widget-title">{i18n(I18nKey.tags)}</div>
+	<div class="tag-cloud">
+		{visible.map((t) => (
+			<a href={getTagUrl(t.name)}>
+				#{t.name}
+				<sup>{t.count}</sup>
+			</a>
+		))}
+		{hiddenCount > 0 && (
+			<a class="tag-fold" href={url("/tags/")} title={`还有 ${hiddenCount} 个标签，查看全部`}>
+				+{hiddenCount}
+			</a>
+		)}
+	</div>
+</section>

@@ -1,0 +1,278 @@
+---
+import { Picture } from "astro:assets";
+import * as path from "node:path";
+import type { ImageMetadata } from "astro";
+import { Icon } from "astro-icon/components";
+import LightDarkSwitch from "@/components/controls/LightDarkSwitch.svelte";
+import Search from "@/components/controls/Search.svelte";
+import { siteConfig } from "@/config";
+import type { NavBarLink } from "@/types/config";
+import { getFallbackFormat, getImageFormats } from "@/utils/image-utils";
+import { resolveNavMenuLinks } from "@/utils/nav-menu-utils";
+import { url } from "@/utils/url-utils";
+
+const links = resolveNavMenuLinks();
+
+const currentPathname =
+	Astro.url.pathname.replace(/\/+$/, "") || "/";
+const normalizePath = (u: string) => {
+	if (!u || u === "#" || /^(https?:)?\/\//.test(u)) return "";
+	return u.replace(/\/+$/, "") || "/";
+};
+/** 当前路径是否属于该导航项（含子菜单） */
+const isLinkActive = (link: NavBarLink) => {
+	const candidates = [
+		link.url,
+		...(link.children?.map((c) => c.url) ?? []),
+	]
+		.map(normalizePath)
+		.filter(Boolean);
+	const isPost = currentPathname.startsWith("/posts/");
+	return candidates.some(
+		(p) =>
+			p === currentPathname ||
+			(p !== "/" && currentPathname.startsWith(`${p}/`)) ||
+			(isPost && p === "/archive"),
+	);
+};
+const navbarTitle = siteConfig.navbar.title || siteConfig.title;
+
+const logoConfig = siteConfig.navbar.logo;
+const logoAlt = logoConfig?.alt || siteConfig.title;
+const logoIsImage = logoConfig?.type === "image" || logoConfig?.type === "url";
+const logoBaseClass = "h-7 w-7 object-contain";
+
+const logoFiles = import.meta.glob<ImageMetadata>(
+	"../../**/*.{png,jpg,jpeg,webp,avif,gif,svg}",
+	{ import: "default" },
+);
+
+async function resolveLocalLogo(value: string): Promise<ImageMetadata | null> {
+	if (
+		logoConfig?.type !== "image" ||
+		!value ||
+		value.startsWith("/") ||
+		value.startsWith("http")
+	) {
+		return null;
+	}
+	const normalizedPath = path
+		.normalize(path.join("../../", value))
+		.replace(/\\/g, "/");
+	const file = logoFiles[normalizedPath];
+	return file ? await file() : null;
+}
+
+const logoLightValue = logoConfig?.value || "";
+const logoDarkValue = logoConfig?.valueDark || "";
+const hasDarkLogo = !!logoDarkValue && logoDarkValue !== logoLightValue;
+
+const logoVariants = await Promise.all(
+	(
+		hasDarkLogo
+			? [
+					{ value: logoLightValue, theme: "light", themeClass: "dark:hidden" },
+					{
+						value: logoDarkValue,
+						theme: "dark",
+						themeClass: "hidden dark:block",
+					},
+				]
+			: [{ value: logoLightValue, theme: "light", themeClass: "" }]
+	)
+		.filter((variant) => !!variant.value)
+		.map(async (variant) => ({
+			theme: variant.theme,
+			class: variant.themeClass
+				? `${logoBaseClass} ${variant.themeClass}`
+				: logoBaseClass,
+			image: await resolveLocalLogo(variant.value),
+			src: logoConfig?.type === "url" ? variant.value : url(variant.value),
+		})),
+);
+---
+
+<!-- 与 MainGridLayout 的 #top-row / #navbar-wrapper 对齐，供滚动逻辑与切页钩子读取 -->
+<div id="top-row" class="magazine-top-row">
+	<div id="navbar-wrapper" class="magazine-navbar-wrapper">
+		<header class="nav" id="navbar">
+			<div class="nav-inner">
+
+				<!-- 左段：Logo + 站名 -->
+				<div class="navbar-seg navbar-seg--left">
+					<a class="navbar-logo" href={url("/")}>
+						{logoConfig?.type === "icon" ? (
+							<Icon
+								name={logoConfig.value || "material-symbols:home-pin-outline"}
+								class="navbar-logo text-[1.6rem] mb-0.5 mr-2"
+							/>
+						) : logoIsImage && logoVariants.length > 0 ? (
+							logoVariants.map((variant) =>
+								variant.image ? (
+									<Picture
+										src={variant.image}
+										alt={logoAlt}
+										class={variant.class}
+										data-logo-theme={variant.theme}
+										formats={getImageFormats()}
+										fallbackFormat={getFallbackFormat()}
+										widths={[28, 56]}
+										loading="eager"
+										fetchpriority="high"
+									/>
+								) : (
+									<img
+										src={variant.src}
+										alt={logoAlt}
+										class={variant.class}
+										data-logo-theme={variant.theme}
+										fetchpriority="high"
+									/>
+								),
+							)
+						) : (
+							<Icon
+								name="material-symbols:home-pin-outline"
+								class="navbar-logo text-[1.6rem] mb-0.5 mr-2"
+							/>
+						)}
+						<span class="navbar-logo-text">{navbarTitle}</span>
+					</a>
+				</div>
+
+				<!-- 中段：胶囊导航 -->
+				<div class="navbar-seg navbar-seg--center">
+					<nav class="navbar-nav has-highlight" id="navbar-nav">
+						<span class="navbar-hover-highlight" data-hover-border></span>
+						{links.map((link: NavBarLink) => (
+							<div class:list={["nav-item", link.children && link.children.length > 0 && "nav-dropdown", isLinkActive(link) && "active"]}>
+								{link.children && link.children.length > 0 ? (
+									<>
+										<button class="nav-link" type="button" aria-haspopup="true">
+											{link.icon && <Icon name={link.icon} class="nav-link-icon" />}
+											{link.name}
+											<Icon name="material-symbols:keyboard-arrow-down-rounded" class="chev" />
+										</button>
+										<div class="dropdown-panel">
+											<div class="dropdown-box">
+												{link.children.map((child) => (
+													<a href={child.external ? child.url : url(child.url)} target={child.external ? "_blank" : undefined}>
+														{child.icon && <Icon name={child.icon} />}
+														{child.name}
+													</a>
+												))}
+											</div>
+										</div>
+									</>
+								) : (
+									<a class="nav-link" href={link.external ? link.url : url(link.url)} target={link.external ? "_blank" : undefined} data-nav-href={link.external ? undefined : url(link.url)}>
+										{link.icon && <Icon name={link.icon} class="nav-link-icon" />}
+										{link.name}
+									</a>
+								)}
+							</div>
+						))}
+					</nav>
+				</div>
+
+				<!-- 右段：搜索 / 主题 / 窄屏菜单 -->
+				<div class="navbar-seg navbar-seg--right">
+					<Search client:load />
+					<LightDarkSwitch client:load />
+					<button
+						class="nav-icon-btn nav-menu-btn"
+						id="nav-menu-switch"
+						aria-label="菜单"
+						aria-controls="nav-menu-panel"
+						aria-expanded="false"
+						type="button"
+					>
+						<Icon name="material-symbols:menu-rounded" class="text-[1.35rem]" />
+					</button>
+				</div>
+			</div>
+		</header>
+	</div>
+</div>
+
+<script>
+	// 窄屏抽屉开关（与 NavMenuPanel 的 data-floating-panel-trigger 对应）
+	const menuBtn = document.getElementById("nav-menu-switch");
+	const menuPanel = document.getElementById("nav-menu-panel");
+	if (menuBtn && menuPanel) {
+		menuBtn.addEventListener("click", (e) => {
+			e.stopPropagation();
+			menuPanel.classList.toggle("float-panel-closed");
+		});
+	}
+
+	// 滚动收缩（桌面端）：切换 .scrolled
+	const nav = document.getElementById("navbar");
+	const onScroll = () => {
+		if (nav) nav.classList.toggle("scrolled", window.scrollY > 40);
+	};
+	window.addEventListener("scroll", onScroll, { passive: true });
+	onScroll();
+
+	// 主题切换面板开关（旧 Navbar 的脚本未随杂志导航迁移，这里补上）
+	const themeBtn = document.getElementById("scheme-switch");
+	const themePanel = document.getElementById("theme-mode-panel");
+	if (themeBtn && themePanel) {
+		themeBtn.addEventListener("click", (e) => {
+			e.stopPropagation();
+			themePanel.classList.toggle("float-panel-closed");
+		});
+	}
+
+	// 主题 Search 组件的桌面/移动两类按钮互斥，杂志导航统一用图标按钮
+	const searchSwitch = document.getElementById("search-switch");
+	if (searchSwitch) searchSwitch.style.setProperty("display", "flex", "important");
+	const searchBar = document.getElementById("search-bar");
+	if (searchBar) searchBar.style.setProperty("display", "none", "important");
+
+	// 胶囊导航：当前页高亮 + 悬停滑动
+	const navBox = document.getElementById("navbar-nav");
+	const highlight = navBox?.querySelector<HTMLElement>(".navbar-hover-highlight");
+	const items = navBox
+		? Array.from(navBox.querySelectorAll<HTMLElement>(".nav-item"))
+		: [];
+	const placeAt = (el: HTMLElement | undefined) => {
+		if (!highlight || !el) return;
+		highlight.style.left = `${el.offsetLeft}px`;
+		highlight.style.width = `${el.offsetWidth}px`;
+	};
+
+	// 依据当前路径重算 active：swup 切页后导航不重渲染，需手动同步
+	const syncActive = (): HTMLElement | undefined => {
+		const path = window.location.pathname.replace(/\/+$/, "") || "/";
+		const isPost = path.startsWith("/posts/");
+		let active: HTMLElement | undefined;
+		items.forEach((el) => {
+			const hrefs = Array.from(el.querySelectorAll("a"))
+				.map((a) => a.getAttribute("href") || "")
+				.filter((h) => h && h !== "#" && !/^(https?:)?\/\//.test(h))
+				.map((h) => h.replace(/\/+$/, "") || "/");
+			const match = hrefs.some(
+				(p) =>
+					p === path ||
+					(p !== "/" && path.startsWith(`${p}/`)) ||
+					(isPost && p === "/archive"),
+			);
+			el.classList.toggle("active", match);
+			if (match) active = el;
+		});
+		return active;
+	};
+
+	let activeItem = syncActive();
+	items.forEach((el) => el.addEventListener("mouseenter", () => placeAt(el)));
+	navBox?.addEventListener("mouseleave", () => placeAt(activeItem));
+	requestAnimationFrame(() => placeAt(activeItem));
+	window.addEventListener("resize", () => placeAt(activeItem));
+	const onPageChange = () => {
+		activeItem = syncActive();
+		placeAt(activeItem);
+	};
+	document.addEventListener("swup:contentReplaced", onPageChange);
+	document.addEventListener("astro:page-load", onPageChange);
+</script>

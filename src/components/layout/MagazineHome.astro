@@ -1,0 +1,69 @@
+---
+import type { Page } from "astro";
+import type { CollectionEntry } from "astro:content";
+import Pagination from "@/components/common/Pagination.astro";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import { getSortedPosts } from "@/utils/content-utils";
+import MagazineCategories from "./MagazineCategories.astro";
+import MagazineDynamic from "./MagazineDynamic.astro";
+import MagazineHero from "./MagazineHero.astro";
+import MagazinePostCard from "./MagazinePostCard.astro";
+import MagazineSiteInfo from "./MagazineSiteInfo.astro";
+import MagazineSiteStats from "./MagazineSiteStats.astro";
+import MagazineTags from "./MagazineTags.astro";
+import Calendar from "@/components/widget/Calendar.astro";
+
+interface Props {
+	page: Page<CollectionEntry<"posts">>;
+}
+
+const { page } = Astro.props;
+const total = (await getSortedPosts()).length;
+const delay = 0;
+const interval = 60;
+---
+
+<MagazineHero />
+
+<!-- 顶部信息卡片行 -->
+<section class="info-row info-row--top">
+	<MagazineCategories />
+	<Calendar widgetConfig={{ type: "calendar", enable: true, position: "top", showTitle: true, specificConfig: { calendar: { showHeatmap: true } } }} />
+	<MagazineSiteInfo />
+	<MagazineDynamic />
+</section>
+
+<!-- 文章列表 -->
+<main class="content-col">
+	<div class="section-head">
+		<div>
+			<span class="eyebrow">Post List</span>
+			<h2 class="section-title">{i18n(I18nKey.postList)}</h2>
+		</div>
+		<div class="section-tools">
+			<span class="count-label">
+				{total} {i18n(I18nKey.postCount)}
+			</span>
+		</div>
+	</div>
+
+	<section class="post-grid">
+		{page.data.map((entry, index) => (
+			<MagazinePostCard
+				entry={entry}
+				loading={index < 2 ? "eager" : "lazy"}
+				class="onload-animation"
+				style={`animation-delay: calc(var(--content-delay) + ${delay + index * interval}ms)`}
+			/>
+		))}
+	</section>
+
+	{page.total > page.size && <Pagination class="mx-auto" page={page} />}
+</main>
+
+<!-- 底部信息卡片行 -->
+<section class="info-row info-row--bottom">
+	<MagazineSiteStats />
+	<MagazineTags />
+</section>

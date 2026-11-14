@@ -1,0 +1,53 @@
+---
+import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import ci from "ci-info";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import { detectBuildPlatform } from "@/utils/build-platform";
+import { formatDateI18nWithTime } from "@/utils/date-utils";
+
+let blogVersion = "unknown";
+try {
+	const pkg = JSON.parse(
+		readFileSync(new URL("../../../package.json", import.meta.url), "utf-8"),
+	);
+	blogVersion = pkg.version || "unknown";
+} catch {}
+
+let astroVersion = "unknown";
+try {
+	const require = createRequire(import.meta.url);
+	const astroPkg = require("astro/package.json");
+	astroVersion = astroPkg.version || "unknown";
+} catch {}
+
+const buildTime = formatDateI18nWithTime(new Date());
+const buildPlatform = detectBuildPlatform({
+	env: process.env,
+	isCI: ci.isCI,
+	ciName: ci.name,
+	isDev: import.meta.env.DEV,
+	unknownBuildPlatform: "Unknown CI",
+});
+
+const items = [
+	{ label: i18n(I18nKey.siteInfoBuildPlatform), value: buildPlatform },
+	{ label: i18n(I18nKey.siteInfoBlogVersion), value: `Firefly v${blogVersion}` },
+	{ label: i18n(I18nKey.siteInfoAstroVersion), value: `Astro v${astroVersion}` },
+	{ label: i18n(I18nKey.siteInfoNodeVersion), value: process.version },
+	{ label: i18n(I18nKey.siteInfoBuildTime), value: buildTime },
+];
+---
+
+<section class="widget">
+	<div class="widget-title">{i18n(I18nKey.siteInfo)}</div>
+	<dl class="info-list">
+		{items.map((item) => (
+			<div>
+				<dt>{item.label}</dt>
+				<dd>{item.value}</dd>
+			</div>
+		))}
+	</dl>
+</section>

@@ -1,0 +1,23 @@
+---
+import DynamicSidebar from "@/components/widget/DynamicSidebar.svelte";
+import { dynamicConfig } from "@/config";
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import { url } from "@/utils/url-utils";
+
+const apiUrl = dynamicConfig.apiUrl?.startsWith("http")
+	? dynamicConfig.apiUrl
+	: url(dynamicConfig.apiUrl || "/api/dynamic.json");
+const memos = dynamicConfig.memos;
+---
+
+<section class="widget">
+	<div class="widget-title">{i18n(I18nKey.latestDynamics)}</div>
+	<div class="dyn-list">
+		<DynamicSidebar client:visible apiUrl={apiUrl} limit={2} {memos} />
+	</div>
+	<a class="widget-more" href={url("/dynamic/")}>
+		{i18n(I18nKey.moreDynamics)}
+		<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+	</a>
+</section>

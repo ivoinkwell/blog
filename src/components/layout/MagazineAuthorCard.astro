@@ -1,0 +1,44 @@
+---
+import { Icon } from "astro-icon/components";
+import ImageWrapper from "@/components/common/ImageWrapper.astro";
+import { profileConfig } from "@/config/profileConfig";
+import { encodeMailto, MAILTO_ONCLICK_SCRIPT } from "@/utils/email-utils";
+import { url } from "@/utils/url-utils";
+---
+
+<section class="profile-card profile-card--row profile-card--author">
+	<a class="profile-avatar" href={url("/about/")} aria-label="关于作者">
+		<ImageWrapper
+			src={profileConfig.avatar || ""}
+			alt="Ivo 的头像"
+			class="profile-avatar-image"
+			loading="lazy"
+			widths={[220]}
+			sizes="110px"
+		/>
+	</a>
+	<div class="profile-main">
+		<h2 class="profile-name">{profileConfig.name}</h2>
+		<div class="profile-divider"></div>
+		<p class="profile-bio">{profileConfig.bio}</p>
+		<div class="profile-links">
+			{profileConfig.links.map((item) => {
+				const isMail = item.url.startsWith("mailto:");
+				const encoded = isMail ? encodeMailto(item.url) : null;
+				return (
+					<a
+						href={isMail ? "#" : item.url}
+						aria-label={item.name}
+						title={item.name}
+						target={isMail ? undefined : "_blank"}
+						rel={isMail ? undefined : "noreferrer"}
+						data-encoded-email={encoded ?? undefined}
+						onclick={isMail ? MAILTO_ONCLICK_SCRIPT : undefined}
+					>
+						<Icon name={item.icon} class="text-[1.15rem]" />
+					</a>
+				);
+			})}
+		</div>
+	</div>
+</section>

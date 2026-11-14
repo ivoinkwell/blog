@@ -1,0 +1,81 @@
+---
+import fs from "node:fs";
+import path from "node:path";
+import { profileConfig, siteConfig } from "@/config";
+import { url } from "@/utils/url-utils";
+
+const currentYear = new Date().getFullYear();
+
+// 与 Footer.astro 一致：读取自定义页脚 HTML
+let customFooterHtml = "";
+try {
+	const footerHtmlPath = path.join(
+		process.cwd(),
+		"src",
+		"config",
+		"FooterConfig.html",
+	);
+	customFooterHtml = fs.readFileSync(footerHtmlPath, "utf-8");
+	customFooterHtml = customFooterHtml.replace(/<!--[\s\S]*?-->/g, "").trim();
+} catch {
+	customFooterHtml = "";
+}
+
+const faviconLight =
+	siteConfig.favicon.find((f) => f.theme === "light") ?? siteConfig.favicon[0];
+const faviconDark = siteConfig.favicon.find((f) => f.theme === "dark");
+const logoSrc = faviconLight?.src ?? null;
+const logoDarkSrc = faviconDark?.src ?? null;
+const links = [
+	{ name: "文章归档", href: url("/archive/") },
+	{ name: "分类", href: url("/categories/") },
+	{ name: "标签", href: url("/tags/") },
+	{ name: "友链", href: url("/friends/") },
+	{ name: "关于", href: url("/about/") },
+	{ name: "RSS", href: url("rss.xml"), external: true },
+	{ name: "GitHub", href: "https://github.com/ivoinkwell/blog", external: true },
+];
+---
+
+<footer class="footer">
+	<div class="footer-inner">
+		<div class="footer-brand">
+			{logoSrc && (
+				<img src={logoSrc} alt="" class="dark:hidden" data-logo-light />
+			)}
+			{logoDarkSrc && (
+				<img src={logoDarkSrc} alt="" class="hidden dark:block" data-logo-dark />
+			)}
+			<span>{siteConfig.title}</span>
+		</div>
+
+		<nav class="footer-links">
+			{links.map((link) => (
+				<a
+					href={link.href}
+					target={link.external ? "_blank" : undefined}
+					rel={link.external ? "noreferrer" : undefined}
+				>
+					{link.name}
+				</a>
+			))}
+		</nav>
+
+		{customFooterHtml && <div class="footer-custom" set:html={customFooterHtml} />}
+
+		<p class="footer-copy">
+			&copy; {currentYear} {profileConfig.name} · 本站已运行
+			<span class="run-days" id="run-days" data-site-start={siteConfig.siteStartDate}>…</span>
+			· 由 Astro + Firefly 驱动
+		</p>
+	</div>
+</footer>
+
+<script is:inline define:vars={{ siteStartDate: siteConfig.siteStartDate }}>
+	const el = document.getElementById("run-days");
+	if (el) {
+		const start = new Date(siteStartDate);
+		const days = Math.max(1, Math.ceil((Date.now() - start.getTime()) / 86400000));
+		el.textContent = `${days} 天`;
+	}
+</script>

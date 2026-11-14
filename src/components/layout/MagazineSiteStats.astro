@@ -1,0 +1,87 @@
+---
+import I18nKey from "@/i18n/i18nKey";
+import { i18n } from "@/i18n/translation";
+import { siteConfig } from "@/config";
+import {
+	getCategoryList,
+	getSortedPosts,
+	getTagList,
+} from "@/utils/content-utils";
+
+const posts = await getSortedPosts();
+const categories = await getCategoryList();
+const tags = await getTagList();
+
+let totalWords = 0;
+for (const post of posts) {
+	if (post.body) {
+		const text = post.body
+			.replace(/```[\s\S]*?```/g, "")
+			.replace(/`[^`]*`/g, "")
+			.replace(/\s+/g, " ")
+			.trim();
+		const chineseChars = text.match(/[\u4e00-\u9fa5]/g) || [];
+		const englishChars = text.match(/[a-zA-Z]/g) || [];
+		totalWords += chineseChars.length + englishChars.length;
+	}
+}
+
+const getActivityDate = (post: (typeof posts)[number]): Date => {
+	const { published, updated } = post.data;
+	if (updated && updated > published) return updated;
+	return published;
+};
+
+const lastActivity = posts.reduce<Date | null>((latest, post) => {
+	const current = getActivityDate(post);
+	if (!latest || current > latest) return current;
+	return latest;
+}, null);
+
+const lastActivityText = lastActivity
+	? `${String(lastActivity.getMonth() + 1).padStart(2, "0")}-${String(
+			lastActivity.getDate(),
+		).padStart(2, "0")}`
+	: "—";
+---
+
+<section class="widget">
+	<div class="widget-title">{i18n(I18nKey.siteStats)}</div>
+	<div class="stats-grid">
+		<div class="stat">
+			<b>{posts.length}</b>
+			<span>{i18n(I18nKey.siteStatsPostCount)}</span>
+		</div>
+		<div class="stat">
+			<b>{categories.length}</b>
+			<span>{i18n(I18nKey.siteStatsCategoryCount)}</span>
+		</div>
+		<div class="stat">
+			<b>{tags.length}</b>
+			<span>{i18n(I18nKey.siteStatsTagCount)}</span>
+		</div>
+		<div class="stat">
+			<b>{totalWords.toLocaleString()}</b>
+			<span>{i18n(I18nKey.siteStatsTotalWords)}</span>
+		</div>
+		<div class="stat">
+			<b data-running-days data-site-start={siteConfig.siteStartDate}>—</b>
+			<span>{i18n(I18nKey.siteStatsRunningDays)}</span>
+		</div>
+		<div class="stat">
+			<b>{lastActivityText}</b>
+			<span>{i18n(I18nKey.siteStatsLastUpdate)}</span>
+		</div>
+	</div>
+</section>
+
+<script is:inline define:vars={{ siteStartDate: siteConfig.siteStartDate }}>
+	const el = document.querySelector("[data-running-days]");
+	if (el) {
+		const days = Math.max(
+			1,
+			Math.ceil((Date.now() - new Date(siteStartDate).getTime()) / 86400000),
+		);
+		el.textContent = String(days);
+	}
+</script>
