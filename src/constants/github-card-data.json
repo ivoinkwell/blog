@@ -1,8 +1,38 @@
 {
-	"cuteleaf/firefly": {
-		"description": "🍀Firefly, fresh and aesthetic Astro blog theme template. ",
-		"language": "Astro",
-		"avatarUrl": "https://avatars.githubusercontent.com/u/43440669?v=4",
+	"agegr/pi-web": {
+		"description": "Web UI for the pi coding agent",
+		"language": "TypeScript",
+		"avatarUrl": "https://avatars.githubusercontent.com/u/12794925?v=4",
+		"license": "MIT"
+	},
+	"chhhhhhen/xiaomi_pc_manager_lite": {
+		"description": "Xiaomi PC Manager Lite 是一个为小米笔记本电脑设计的轻量级 Windows 工具，支持电池养护充电、性能模式切换、全局快捷键、托盘操作及自启动等功能。",
+		"language": "Rust",
+		"avatarUrl": "https://avatars.githubusercontent.com/u/73321250?v=4",
+		"license": null
+	},
+	"fantasy-ke/obsidian-cf-imgbed": {
+		"description": "这是一个用于 Obsidian 的图片上传插件，可以将图片上传到 [CloudFlare ImgBed](https://github.com/MarSeventh/CloudFlare-ImgBed)  服务，支持多种上传方式和灵活的配置选项。",
+		"language": "TypeScript",
+		"avatarUrl": "https://avatars.githubusercontent.com/u/85232349?v=4",
+		"license": "Apache-2.0"
+	},
+	"ivoinkwell/forum-anon": {
+		"description": "班级匿名反馈系统",
+		"language": "Vue",
+		"avatarUrl": "https://avatars.githubusercontent.com/u/222547839?v=4",
+		"license": "NOASSERTION"
+	},
+	"ivoinkwell/pi-installer": {
+		"description": "Pi Agent&Pi Web Installer",
+		"language": "Shell",
+		"avatarUrl": "https://avatars.githubusercontent.com/u/222547839?v=4",
+		"license": null
+	},
+	"marseventh/cloudflare-imgbed": {
+		"description": "🏖️ A serverless, open-source file hosting solution built on Cloudflare. Supports image hosting, secure file storage, and personal cloud drive capabilities.",
+		"language": "JavaScript",
+		"avatarUrl": "https://avatars.githubusercontent.com/u/108160987?v=4",
 		"license": "MIT"
 	},
 	"saicaca/fuwari": {

@@ -1,0 +1,40 @@
+---
+import { url } from "@/utils/url-utils";
+---
+
+<!--
+	按需加载 pagefind.js。
+	原先这段内联脚本写在 Navbar.astro 里，杂志改版后导航换成 MagazineNavbar，
+	脚本不再被渲染，导致生产环境搜索永远初始化不了。这里抽成独立组件，
+	由 MagazineNavbar 全站渲染（search.astro 的 AdvancedSearch 也会调用 __loadPagefind）。
+-->
+{import.meta.env.PROD && (
+	<script is:inline data-swup-ignore-script define:vars={{ scriptUrl: url("/pagefind/pagefind.js") }}>
+		async function loadPagefind() {
+			try {
+				const response = await fetch(scriptUrl, { method: "HEAD" });
+				if (!response.ok) {
+					throw new Error(`Pagefind script not found: ${response.status}`);
+				}
+				const pagefind = await import(scriptUrl);
+				await pagefind.options({
+					excerptLength: 20
+				});
+				window.pagefind = pagefind;
+				document.dispatchEvent(new CustomEvent('pagefindready'));
+			} catch (error) {
+				console.error('Failed to load Pagefind:', error);
+				window.pagefind = {
+					search: () => Promise.resolve({ results: [] }),
+					options: () => Promise.resolve(),
+				};
+				document.dispatchEvent(new CustomEvent('pagefindloaderror'));
+			}
+		}
+
+		window.__loadPagefind = function () {
+			if (!window.__pagefindLoading) window.__pagefindLoading = loadPagefind();
+			return window.__pagefindLoading;
+		};
+	</script>
+)}

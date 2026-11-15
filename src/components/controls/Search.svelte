@@ -33,7 +33,7 @@ const fakeResult: SearchResult[] = [
 ];
 
 // --- UI Logic ---
-// pagefind.js 是按需加载的（见 Navbar.astro），搜索 UI 一被碰到就触发。
+// pagefind.js 是按需加载的（见 PagefindLoader.astro），搜索 UI 一被碰到就触发。
 // 幂等，重复调用只会拿到同一个 promise。
 const requestPagefind = (): void => {
 	window.__loadPagefind?.();

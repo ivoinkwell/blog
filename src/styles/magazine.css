@@ -696,7 +696,7 @@ html.dark .theme-btn .moon {
 }
 
 .widget.profile-card--hero .profile-avatar {
-	width: 112px;
+	width: 136px;
 	margin: 0;
 	flex-shrink: 0;
 }
@@ -1277,19 +1277,20 @@ html.dark .tag-cloud a:hover {
 }
 
 .dyn-item {
-	display: block;
-	padding: 0.75rem 0;
+	display: flex;
+	align-items: center;
+	min-height: 4rem;
+	padding: 0.5rem;
 	border-bottom: 1px dashed var(--line);
 	transition: all 0.15s ease;
 }
 
-.dyn-item:first-child {
-	padding-top: 0;
-}
-
 .dyn-item:last-child {
 	border-bottom: none;
-	padding-bottom: 0.35rem;
+}
+
+.dyn-item:hover {
+	border-bottom-color: transparent;
 }
 
 .dyn-date {
@@ -1318,7 +1319,7 @@ html.dark .dyn-date {
 }
 
 .dyn-item:hover p {
-	color: var(--text-75);
+	color: var(--primary);
 }
 
 /* ---------- 站点统计 ---------- */
@@ -2155,6 +2156,11 @@ html.dark .page-btn.active {
 .page-ellipsis {
 	color: var(--text-35);
 	padding: 0 0.2rem;
+}
+
+/* 分页与上方文章列表的间距（分页组件自带的外层容器） */
+.pagination-wrapper {
+	margin-top: 2.75rem;
 }
 
 /* ============================================================
@@ -3103,7 +3109,7 @@ html.dark .footer-copy .run-days {
 	}
 
 	.widget.profile-card--hero .profile-avatar {
-		width: 88px;
+		width: 104px;
 	}
 
 	.widget.profile-card--hero .profile-name {
@@ -3509,6 +3515,11 @@ html.dark .footer-copy .run-days {
 }
 
 .friends-custom .prose p {
+	margin-top: 0;
+}
+
+/* 卡片内的标题不需要 .prose 的 37.76px 上边距（会顶开「注意事项」等标题） */
+.friends-custom .prose h3 {
 	margin-top: 0;
 }
 

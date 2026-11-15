@@ -91,12 +91,15 @@ onMount(() => {
 	if (import.meta.env.DEV) {
 		initialize();
 	} else {
-		// 生产环境等待 Pagefind 加载
+		// 生产环境等待 Pagefind 加载（__loadPagefind 由 PagefindLoader 挂载，全站可用）
 		window.__loadPagefind?.();
 		if (window.pagefind) {
 			initialize();
 		} else {
 			document.addEventListener("pagefindready", initialize, {
+				once: true,
+			});
+			document.addEventListener("pagefindloaderror", initialize, {
 				once: true,
 			});
 		}

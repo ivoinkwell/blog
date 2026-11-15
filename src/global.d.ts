@@ -22,7 +22,7 @@ declare global {
 				}>;
 			}>;
 		};
-		/** 按需加载 pagefind.js，由 Navbar.astro 的内联脚本挂载；幂等 */
+		/** 按需加载 pagefind.js，由 PagefindLoader.astro 的内联脚本挂载；幂等 */
 		__loadPagefind?: () => Promise<void>;
 		__pagefindLoading?: Promise<void>;
 		__fireflyMusic?: {
