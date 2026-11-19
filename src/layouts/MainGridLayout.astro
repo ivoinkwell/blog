@@ -180,6 +180,20 @@ const {
 
 <FloatingControls headings={headings} encrypted={encrypted} />
 
+{/*
+    杂志模式不渲染 WallpaperSection / 侧栏，但 swup 的 containers 仍配置了这些 id。
+    与 SidebarColumn、WallpaperSection 的做法一致：补空占位容器（永远为空、不参与布局），
+    否则 Swup replaceContent 匹配失败，切页会退化为整页跳转并污染历史记录（表现为返回退不出去）。
+*/}
+{magazine && (
+  <>
+    <div id="banner-overlay-container" class="hidden"></div>
+    <div id="banner-dim-container" class="hidden"></div>
+    <div id="left-sidebar-dynamic" class="hidden transition-swup-fade" data-sidebar-placeholder="true"></div>
+    <div id="right-sidebar-dynamic" class="hidden transition-swup-fade" data-sidebar-placeholder="true"></div>
+  </>
+)}
+
 <!-- 移动端导航抽屉：渲染为 <body> 直系子元素，脱离导航栏的 transform 包含块才能铺满视口 -->
 <NavMenuPanel links={resolveNavMenuLinks()} />
 
