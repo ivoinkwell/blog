@@ -111,10 +111,6 @@
     @apply not-italic border-transparent relative;
     font-weight: inherit;
 
-    &:before {
-      @apply content-[''] absolute -left-1 block transition bg-(--btn-regular-bg) h-full w-1 rounded-full;
-    }
-
     /* Remove the double quotes from default styles */
     p:before,
     p:after {
